@@ -8,7 +8,6 @@ services:
     restart: unless-stopped
     image: marianferenc/text-classification-demo:latest
     ports:
-      - 6006:6006
       - 8888:8888
       - 5000:5000
     volumes:

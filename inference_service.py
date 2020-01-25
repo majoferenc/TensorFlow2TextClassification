@@ -63,8 +63,10 @@ def classify(input_text):
     padded = pad_sequences(seq, maxlen=max_length)
     pred = model.predict(padded)
     labels = ['sport', 'bussiness', 'politics', 'tech', 'entertainment']
-    print(pred)
-    result = str(labels[np.argmax(pred)])
+    try:
+        result = [str(labels[np.argmax(pred)]),str(np.max(pred))]
+    except Exception:
+        result = ["not certain", 0]
     return result
 
 flask_app = Flask(__name__)
@@ -78,7 +80,7 @@ def flask_post_endpoint():
     return jsonify(isError=False,
                    message="Success",
                    statusCode=200,
-                   data=({"class": output_data})), 200
+                   data=({"class": output_data[0], "probability": output_data[1]})), 200
 
 if __name__ == '__main__':
     flask_app.run(host='0.0.0.0', port=8888, debug=True)

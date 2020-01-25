@@ -71,14 +71,16 @@ print(decode_input_element(train_padded[10]))
 print('---')
 print(train_input_elements[10])
 
+
 model = tf.keras.Sequential([
-    tf.keras.layers.Embedding(vocab_size, embedding_dim,
-                             input_length=max_length),
-    # specify the number of convolutions that you want to learn, their size, and their activation function.
-    # words will be grouped into the size of the filter in this case 5
-    tf.keras.layers.Conv1D(128, 5, activation='relu'),
-    tf.keras.layers.GlobalAveragePooling1D(),
-    tf.keras.layers.Dense(64, activation='relu'),
+    # Add an Embedding layer expecting input vocab of size 5000, and output embedding dimension of size 64 we set at the top
+    tf.keras.layers.Embedding(vocab_size, embedding_dim),
+    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(embedding_dim)),
+#    tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(32)),
+    # use ReLU in place of tanh function since they are very good alternatives of each other.
+    tf.keras.layers.Dense(embedding_dim, activation='relu'),
+    # Add a Dense layer with 6 units and softmax activation.
+    # When we have multiple outputs, softmax convert outputs layers into a probability distribution.
     tf.keras.layers.Dense(6, activation='softmax')
 ])
 model.summary()
@@ -94,7 +96,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
 
 tensorboard_callback = tf.keras.callbacks.TensorBoard('logs/1/train')
 
-num_epochs = 20
+num_epochs = 15
 history = model.fit(train_padded, training_label_seq, epochs=num_epochs, validation_data=(validation_padded, validation_label_seq), verbose=2, callbacks=[cp_callback, tensorboard_callback])
 # Save the entire model to a HDF5 file
 model.save('training_1/my_model.h5')
