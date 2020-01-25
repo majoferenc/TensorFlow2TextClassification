@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  tensorflow-train:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    image: marianferenc/text-classification-demo:latest
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python inference.py"
